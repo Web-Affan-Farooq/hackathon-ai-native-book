@@ -2,46 +2,47 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Welcome to the Physical AI & Humanoid Robotics Course
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Welcome to your journey into the world of **Physical AI and Humanoid Robotics**! This course is designed to bridge the gap between intelligent software systems and the physical robots that bring them to life. Throughout this course, you will learn how AI can control humanoid robots, understand their sensors, plan actions, and interact with the physical world.
 
-## Getting Started
+## What This Documentation Contains
 
-Get started by **creating a new site**.
+This set of documents is your **comprehensive guide** for learning and practicing all the essential concepts of Physical AI. Here’s what you will find:
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+- **Course Overview**  
+  Learn about the fundamentals of Physical AI, embodied intelligence, humanoid robotics, and sensor systems.
 
-### What you'll need
+- **Modules**  
+  Structured learning paths that cover:
+  1. **ROS2 (Robot Operating System 2)** – Architecture, nodes, topics, services, Python integration, and URDF for humanoids.
+  2. **Digital Twin & Simulation** – Using Gazebo, URDF/SDF models, and physics simulation to replicate real-world robots virtually.
+  3. **NVIDIA Isaac** – Overview of Isaac SDK, Isaac Sim setup, perception, manipulation, and reinforcement learning.
+  4. **VLA (Voice-to-Action & Cognitive Planning)** – Implementing voice-controlled AI and intelligent planning strategies.
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+- **Weekly Breakdown**  
+  A structured timeline to guide your learning week by week.
 
-## Generate a new site
+- **Assessments**  
+  Hands-on projects including ROS2-based projects and a capstone project to test your skills.
 
-Generate a new Docusaurus site using the **classic template**.
+- **Hardware Requirements**  
+  Recommendations for workstations and edge AI kits to support your learning and projects.
 
-The classic template will automatically be added to your project after you run the command:
+- **Capstone Project**  
+  Step-by-step guide to building a complete humanoid robotics system from architecture to perception, manipulation, and integration.
 
-```bash
-npm init docusaurus@latest my-website classic
-```
+- **Glossary**  
+  Definitions of key robotics and AI terms to strengthen your understanding.
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+## How to Use These Docs
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+1. Start with **Course Overview** to get a conceptual foundation.  
+2. Follow the **Modules** sequentially as they build on each other.  
+3. Use **Weekly Breakdown** to pace your learning.  
+4. Complete **Assessments** and the **Capstone Project** to apply your knowledge practically.  
+5. Refer to **Hardware Requirements** and **Glossary** whenever needed.
 
-## Start your site
+This documentation is designed to be **hands-on and practical**. Make sure to explore exercises, experiment with code, and fully engage with the projects. By the end of this course, you will be confident in building and programming humanoid robots powered by AI.
 
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+Let's get started! 🚀

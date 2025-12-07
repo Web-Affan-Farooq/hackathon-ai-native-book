@@ -5,8 +5,8 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: 'Learn Modern Physical AI And Humanoid Robotics',
+  tagline: 'Learn state of the art robotics skills and gain hands on experience with ROS 2 , Nvidia ISAAC ',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -74,27 +74,28 @@ const config: Config = {
     colorMode: {
       respectPrefersColorScheme: true,
     },
-    navbar: {
-      title: 'My Site',
-      logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
-      },
-      items: [
-        {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
-          label: 'Tutorial',
-        },
-        {to: '/blog', label: 'Blog', position: 'left'},
-        {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
-          position: 'right',
-        },
-      ],
+navbar: {
+  title: 'Robotics',
+  logo: {
+    alt: 'My Site Logo',
+    src: 'img/logo.svg',
+  },
+  items: [
+    {
+      type: 'docSidebar',
+      sidebarId: 'tutorialSidebar',
+      position: 'left',
+      label: 'Tutorial',
     },
+    // Removed the blog link
+    {
+      href: 'https://github.com/facebook/docusaurus',
+      label: 'GitHub',
+      position: 'right',
+    },
+  ],
+},
+
     footer: {
       style: 'dark',
       links: [
