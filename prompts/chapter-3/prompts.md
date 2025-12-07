@@ -1,5 +1,5 @@
 ```markdown
-/sp.specify Module 2 — Digital Twin & Simulation Foundations
+/sp.specify    Module 2 — Digital Twin & Simulation Foundations
 
 Target audience: Learners preparing to simulate humanoid robots using Gazebo and Digital Twin workflows.
 
@@ -11,7 +11,7 @@ Focus:
 - Practical exercises bridging ROS2 and simulation
 
 Success criteria:
-- Generates 5 markdown files: index.md, gazebo-basics.md, urdf-sdf.md, physics-simulation.md, exercises.md
+- Generates 5 markdown files in `./textbook/docs/module-2-digital-twin-simulation-foundations`: index.md, gazebo-basics.md, urdf-sdf.md, physics-simulation.md, exercises.md
 - Explains concepts clearly with humanoid robotics relevance
 - Describes workflows (not full projects) using Markdown diagrams
 - Connects to Module 1 content where appropriate
@@ -57,9 +57,7 @@ Identify what needs clarification before planning generation.
 ```
 
 ```markdown
-/sp.plan
-
-Create: content structure, file sequence, modeling workflow notes, and validation rules.
+/sp.plan    Create: content structure, file sequence, modeling workflow notes, and validation rules.
 
 Decisions needing documentation:
 - Level of detail for URDF→SDF conversion
@@ -67,7 +65,7 @@ Decisions needing documentation:
 - How many exercises and what progression
 
 Testing strategy:
-- Ensure all 5 markdown files are generated
+- Ensure all 5 markdown files are generated in destination folder  `./textbook/docs/module-2-digital-twin-simulation`
 - Check internal cross-links to Module 1
 - Validate accuracy of Gazebo/Ignition terminology
 - Confirm physics explanations are correct and accessible
