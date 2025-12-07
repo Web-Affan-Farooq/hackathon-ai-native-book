@@ -1,0 +1,167 @@
+# Content API Contract for Physical AI & Humanoid Robotics Course Overview
+
+openapi: 3.0.0
+info:
+  title: Course Overview Content API
+  description: API for managing content for the Physical AI & Humanoid Robotics course overview module
+  version: 1.0.0
+
+paths:
+  /course-overview/{module}:
+    get:
+      summary: Retrieve course overview module content
+      description: Get content for a specific course overview module
+      parameters:
+        - name: module
+          in: path
+          required: true
+          description: Module identifier (index, physical-ai-intro, embodied-intelligence, humanoid-robotics-landscape, sensor-systems)
+          schema:
+            type: string
+            enum: [index, physical-ai-intro, embodied-intelligence, humanoid-robotics-landscape, sensor-systems]
+      responses:
+        '200':
+          description: Module content retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  module:
+                    type: string
+                    description: Module identifier
+                  title:
+                    type: string
+                    description: Module title
+                  content:
+                    type: string
+                    description: Markdown content of the module
+                  wordCount:
+                    type: integer
+                    description: Number of words in the content
+                    example: 1250
+                  boldedTerms:
+                    type: array
+                    items:
+                      type: string
+                    description: List of bolded terms for scannability
+                    example: ["Physical AI", "Embodied Intelligence", "Sensor Fusion"]
+                  crossReferences:
+                    type: array
+                    items:
+                      type: string
+                    description: Modules referenced in this content
+                    example: ["Module 2: Digital Twins", "Module 3: Sim-to-Real"]
+                  status:
+                    type: string
+                    enum: [draft, review, approved]
+                    description: Content status in the workflow
+        '404':
+          description: Module not found
+
+  /course-overview/landscape-table:
+    get:
+      summary: Retrieve humanoid robotics landscape comparison table
+      description: Get the structured table comparing major players in humanoid robotics
+      responses:
+        '200':
+          description: Landscape table retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  companies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        company:
+                          type: string
+                          description: Name of the company
+                        platform:
+                          type: string
+                          description: Robot platform/model
+                        focusArea:
+                          type: string
+                          description: Primary application domain
+                        yearFounded:
+                          type: integer
+                          description: Company establishment year
+                        currentStatus:
+                          type: string
+                          description: Current development/availability status
+                        digitalTwinsConnection:
+                          type: string
+                          description: Relevance to Digital Twins concepts
+                        simToRealConnection:
+                          type: string
+                          description: Relevance to Sim-to-Real challenges
+        '404':
+          description: Landscape table not found
+
+components:
+  schemas:
+    ModuleContent:
+      type: object
+      required:
+        - module
+        - title
+        - content
+        - status
+      properties:
+        module:
+          type: string
+          description: Module identifier
+        title:
+          type: string
+          description: Module title
+        content:
+          type: string
+          description: Markdown content of the module
+        wordCount:
+          type: integer
+          description: Number of words in the content (1000-1500)
+        boldedTerms:
+          type: array
+          items:
+            type: string
+          description: List of 3-5 bolded terms for scannability
+        crossReferences:
+          type: array
+          items:
+            type: string
+          description: Modules referenced in this content
+        status:
+          type: string
+          enum: [draft, review, approved]
+          description: Content status in the workflow
+
+    LandscapeEntry:
+      type: object
+      required:
+        - company
+        - platform
+        - focusArea
+      properties:
+        company:
+          type: string
+          description: Name of the company
+        platform:
+          type: string
+          description: Robot platform/model
+        focusArea:
+          type: string
+          description: Primary application domain
+        yearFounded:
+          type: integer
+          description: Company establishment year
+        currentStatus:
+          type: string
+          description: Current development/availability status
+        digitalTwinsConnection:
+          type: string
+          description: Relevance to Digital Twins concepts
+        simToRealConnection:
+          type: string
+          description: Relevance to Sim-to-Real challenges
