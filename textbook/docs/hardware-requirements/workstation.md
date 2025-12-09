@@ -1,6 +1,6 @@
 ---
-title: Workstation Requirements
-sidebar_position: 1
+title: "Workstation Requirements"
+sidebar_position: 2
 ---
 
 # Workstation Requirements

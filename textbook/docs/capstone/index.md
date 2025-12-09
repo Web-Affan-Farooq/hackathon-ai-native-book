@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+title: Capstone Humanoid Voice-to-Action Robot Pipeline
 ---
 
 # Capstone: Humanoid Voice-to-Action Robot Pipeline

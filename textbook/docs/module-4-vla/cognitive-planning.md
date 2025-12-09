@@ -1,3 +1,7 @@
+---
+title: Cognitive Planning for Robotic Agents
+sidebar_position: 3
+---
 # Cognitive Planning for Robotic Agents
 
 ## Context

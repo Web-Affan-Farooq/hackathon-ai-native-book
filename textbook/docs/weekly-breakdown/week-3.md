@@ -1,3 +1,8 @@
+---
+title:  Week 3 Digital Twin Development with Gazebo
+sidebar_position: 4
+---
+
 # Week 3: Digital Twin Development with Gazebo
 
 ## Learning Objectives

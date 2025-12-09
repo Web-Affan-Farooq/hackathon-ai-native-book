@@ -1,3 +1,8 @@
+---
+title: Voice-to-Action Systems for Humanoid Robotics
+sidebar_position: 2
+---
+
 # Voice-to-Action Systems for Humanoid Robotics
 
 ## Context

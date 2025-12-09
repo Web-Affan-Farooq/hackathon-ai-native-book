@@ -1,3 +1,8 @@
+---
+title: Week 2 Simulation Basics and URDF Modeling
+sidebar_position: 3
+---
+
 # Week 2: Simulation Basics and URDF Modeling
 
 ## Learning Objectives

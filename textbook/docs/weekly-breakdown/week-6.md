@@ -1,3 +1,8 @@
+---
+title: Week 6 Voice-Language-Action (VLA) and Cognitive Planning
+sidebar_position: 7
+---
+
 # Week 6: Voice-Language-Action (VLA) and Cognitive Planning
 
 ## Learning Objectives

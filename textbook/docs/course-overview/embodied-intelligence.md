@@ -1,6 +1,7 @@
 ---
 title: Embodied Intelligence Concepts
 sidebar_position: 3
+# id: course-overview-embodied-intelligence
 ---
 
 # Embodied Intelligence Concepts
