@@ -1,7 +1,8 @@
+
 ## Specification :
 
 ```markdown
-/sp.specify VLA (Voice & Language Agents) Chapter Content
+/sp.specify      VLA (Voice & Language Agents) Chapter Content
 
 Target audience: Advanced students and professionals in robotics and AI
 Focus: Understanding and implementing voice-to-action pipelines and cognitive planning for humanoid robotics
@@ -14,9 +15,10 @@ Success criteria:
 - Content fully compatible with Markdown/Docusaurus docs folder structure
 
 Constraints:
-
+- Create specs in `/specs/004-vla`
 - Word count: 2000–3500 words
-- Format: Markdown, to be generated inside ./textbook/docs/module-4-vla
+- Use `vla-architect` claude subagent
+- Format: Markdown, to be generated inside `./textbook/docs/module-4-vla`
 - Internal links placeholders to previous modules or exercises
 - Timeline: Complete within 1 week
 
@@ -48,7 +50,8 @@ What gaps should I address before planning the chapter structure?
 ## plan :
 
 ```markdown
-/sp.plan Create: architecture sketch, section structure, practical example workflows, exercises, quality validation.
+/sp.plan  
+Create: architecture sketch, section structure, practical example workflows, exercises, quality validation.
 Decisions needing documentation: number of examples per topic, language choice, depth of cognitive planning coverage.
 Testing strategy: validate content completeness against success criteria; exercises runnable in simulated or SDK environment.
 
@@ -56,7 +59,8 @@ Technical details:
 
 - Follow phased structure: Index → Voice-to-Action → Cognitive Planning → Exercises
 - Markdown formatting ready for Docusaurus
-- All files to be generated in ./textbook/docs/module-4-vla
+- All files to be generated in `./textbook/docs/module-4-vla`
 - Use internal links for cross-references to previous modules
 - Ensure consistent terminology aligned with glossary
+- Use claude code subagent `@vla-architect`
 ```
