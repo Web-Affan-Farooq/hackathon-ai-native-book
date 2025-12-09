@@ -1,3 +1,8 @@
+---
+title: Exercises Vision-Language-Action Systems
+sidebar_position: 4
+---
+
 # Exercises: Vision-Language-Action Systems
 
 ## Exercise 1: Voice Command Processing Pipeline

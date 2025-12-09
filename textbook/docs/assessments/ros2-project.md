@@ -1,3 +1,8 @@
+---
+sidebar_position: 2
+title: ROS2 Project Assessment
+---
+
 # ROS2 Project Assessment
 
 ## Learning Objectives

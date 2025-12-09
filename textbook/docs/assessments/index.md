@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+title: Assessments Overview
+---
 # Assessments Overview
 
 ## Learning Objectives

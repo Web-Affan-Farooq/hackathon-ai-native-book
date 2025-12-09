@@ -1,3 +1,7 @@
+---
+title: Week 5 Perception and Manipulation Systems
+sidebar_position: 6
+---
 # Week 5: Perception and Manipulation Systems
 
 ## Learning Objectives

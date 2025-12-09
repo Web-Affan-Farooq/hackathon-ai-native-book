@@ -1,3 +1,7 @@
+---
+title: Week 1 ROS 2 Fundamentals and Environment Setup
+sidebar_position: 2
+---
 # Week 1: ROS 2 Fundamentals and Environment Setup
 
 ## Learning Objectives

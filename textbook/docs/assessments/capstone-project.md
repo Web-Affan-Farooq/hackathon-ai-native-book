@@ -1,3 +1,8 @@
+---
+sidebar_position: 3
+title: Capstone Project Assessment
+---
+
 # Capstone Project Assessment
 
 ## Learning Objectives

@@ -1,3 +1,8 @@
+---
+title: Week 4 NVIDIA Isaac Sim Workflows
+sidebar_position: 5
+---
+
 # Week 4: NVIDIA Isaac Sim Workflows
 
 ## Learning Objectives

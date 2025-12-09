@@ -1,3 +1,8 @@
+---
+title: 6-Week Humanoid Robotics Learning Sprint
+sidebar_position: 1
+---
+
 # 6-Week Humanoid Robotics Learning Sprint
 
 ## Overview

@@ -1,3 +1,8 @@
+---
+title: Module 4 Vision-Language-Action (VLA) Systems for Humanoid Robotics
+sidebar_position: 1
+---
+
 # Module 4: Vision-Language-Action (VLA) Systems for Humanoid Robotics
 
 ## Overview

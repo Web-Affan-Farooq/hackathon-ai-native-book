@@ -1,6 +1,6 @@
 ---
 title: Edge AI Kit
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Edge AI Kit
