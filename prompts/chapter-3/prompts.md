@@ -1,83 +1,57 @@
+## Specification :
 ```markdown
-/sp.specify    Module 2 — Digital Twin & Simulation Foundations
+/sp.specify    3. NVIDIA Isaac Chapter Content
 
-Target audience: Learners preparing to simulate humanoid robots using Gazebo and Digital Twin workflows.
-
-Focus:
-- Digital Twin principles
-- Gazebo (Ignition) basics
-- URDF → SDF conversion and model structuring
-- Physics simulation essentials for humanoid behaviors
-- Practical exercises bridging ROS2 and simulation
+Target audience: Advanced students and professionals in robotics and AI
+Focus: Hands-on understanding of NVIDIA Isaac SDK and Isaac Sim for humanoid robotics
 
 Success criteria:
-- Generates 5 markdown files in `./textbook/docs/module-2-digital-twin-simulation-foundations`: index.md, gazebo-basics.md, urdf-sdf.md, physics-simulation.md, exercises.md
-- Explains concepts clearly with humanoid robotics relevance
-- Describes workflows (not full projects) using Markdown diagrams
-- Connects to Module 1 content where appropriate
+- Covers SDK architecture, simulation setup, perception, manipulation, and RL concepts
+- Provides step-by-step practical guidance with examples in Isaac Sim
+- Exercises for each concept to reinforce learning
+- Content ready for Markdown/Docusaurus format and all markdown files placed inside `./textbook/docs/module-3-nvidia-isaac`
 
 Constraints:
-- Conceptual + practical balance
-- No long code samples or full robot models
-- Must use correct Gazebo/Ignition terminology
-- Prepare reader for Module 3 (Isaac Sim + sim-to-real)
+- Word count: 2500–4000 words
+- Format: Markdown, suitable for Docusaurus docs folder
+- Internal links placeholders for exercises and related modules
+- Timeline: Complete within 1 week
 
 Not building:
-- Detailed environment modeling
-- Mesh authoring or CAD workflows
-- ROS2 controller design
-- Full Digital Twin pipelines with cloud systems
+- Full RL course from scratch
+- In-depth GPU programming
+- Vendor-specific hardware setup outside simulation
 
 ```
 
+## Clarification :
 ```markdown
-/sp.clarify
+/sp.clarify Please analyze it for:
+1. Ambiguous terms (e.g., "practical guidance"—how detailed? How many code examples?)
+2. Missing assumptions (audience prior knowledge? Python or C++ focus?)
+3. Incomplete requirements (how to balance theory vs hands-on examples? How many exercises?)
+4. Scope conflicts (overview vs detailed SDK instructions? Simulation vs real robot?)
 
-My Module 2 simulation specification is at textbook/docs/module-2-digital-twin/spec.md  
-Please analyze it for:
-
-1. Ambiguous terms  
-   - How deep should SDF schema explanations go?  
-   - Expected level of physics detail?  
-
-2. Missing assumptions  
-   - Required prior knowledge (Module 1 ROS2 concepts?)  
-   - Should Gazebo examples use Fortress, Harmonic, or generic Ignition?  
-
-3. Incomplete requirements  
-   - How detailed should index.md be?  
-   - Should exercises depend on ROS2 nodes?  
-
-4. Scope conflicts  
-   - General simulation concepts vs humanoid-specific needs  
-   - How much overlap with Module 3 should be avoided?
-
-Identify what needs clarification before planning generation.
+What gaps should I address before planning the chapter structure?
 
 ```
 
+## Plan :
 ```markdown
-/sp.plan    Create: content structure, file sequence, modeling workflow notes, and validation rules.
-
-Decisions needing documentation:
-- Level of detail for URDF→SDF conversion
-- Whether physics examples use humanoid walking or generic rigid-body demos
-- How many exercises and what progression
-
-Testing strategy:
-- Ensure all 5 markdown files are generated in destination folder  `./textbook/docs/module-2-digital-twin-simulation`
-- Check internal cross-links to Module 1
-- Validate accuracy of Gazebo/Ignition terminology
-- Confirm physics explanations are correct and accessible
+/sp.plan    Create: architecture sketch, section structure, practical example workflow, exercises, quality validation.
+Decisions needing documentation: number of examples per topic, language choice (Python/C++), RL depth.
+Testing strategy: validate content completeness against success criteria; exercises runnable in Isaac Sim.
 
 Technical details:
-- Phased generation:
-  1. index.md  
-  2. gazebo-basics.md  
-  3. urdf-sdf.md  
-  4. physics-simulation.md  
-  5. exercises.md  
-- Research-while-writing workflow
-- Markdown ready for Docusaurus navigation
-
+- Follow phased structure: Index → SDK Overview → Setup → Perception/Manipulation → Reinforcement Learning → Exercises
+- Markdown formatting ready for Docusaurus
+- Use internal links for cross-references to previous modules
+- Ensure consistent terminology aligned with glossary
+- Following files should be created inside the `./textbook/docs/module-3-nvidia-isaac` folder .
+    - index.md
+    - isaac-sdk-overview.md
+    - isaac-sim-setup.md
+    - perception-and-manipulation.md
+    - reinforcement-learning.md
+    - exercises.md
 ```
