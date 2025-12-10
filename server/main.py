@@ -1,6 +1,4 @@
-def main():
-    print("Hello from server!")
+from embedding import Embedding
 
-
-if __name__ == "__main__":
-    main()
+emb = Embedding()
+emb.create_rag()
