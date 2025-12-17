@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import Heading from '@theme/Heading';
 
 import styles from './index.module.css';
@@ -21,7 +20,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/intro">
-            Docusaurus Tutorial - 5min ⏱️
+            Get Started with Robotics
           </Link>
         </div>
       </div>
@@ -33,11 +32,28 @@ export default function Home(): ReactNode {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title={`Welcome to ${siteConfig.title}`}
+      description="Learn Modern Physical AI And Humanoid Robotics">
       <HomepageHeader />
       <main>
-        <HomepageFeatures />
+        <section className={styles.features}>
+          <div className="container">
+            <div className="row">
+              <div className="col col--4">
+                <h2>Learn Robotics</h2>
+                <p>Master ROS 2, simulation, NVIDIA Isaac, and Vision-Language-Action models.</p>
+              </div>
+              <div className="col col--4">
+                <h2>Hands-on Experience</h2>
+                <p>Gain practical experience with humanoid robotics platforms and AI systems.</p>
+              </div>
+              <div className="col col--4">
+                <h2>AI Integration</h2>
+                <p>Understand how modern AI techniques apply to robotics and autonomous systems.</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </Layout>
   );
