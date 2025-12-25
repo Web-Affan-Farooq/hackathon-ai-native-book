@@ -1,15 +1,13 @@
 import os
-import uuid
 from datetime import datetime, timedelta
-from fastapi import FastAPI, Query, Response, Request, HTTPException, Depends
+from fastapi import FastAPI, Response, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, String, DateTime, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session, relationship
+from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 import bcrypt
 import jwt
 from dotenv import load_dotenv
-from schema import GetChatsPayload , SignupPayload , LoginPayload , AskPayload 
+from schema import SignupPayload , LoginPayload , AskPayload ,GetChatsPayload
 from modals import User , SessionDB , Chat , SessionLocal 
 
 
@@ -62,7 +60,6 @@ origins = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:8080",
-    "https://your-frontend-domain.com"
 ]
 
 app = FastAPI()
@@ -88,8 +85,13 @@ def signup_user(payload: SignupPayload, response: Response, db: Session = Depend
     try:
         # Validate payload data
         if not payload.name.strip():
-            raise HTTPException(status_code=400, detail="Name cannot be empty")
-
+            return JSONResponse(
+                status_code=400, 
+                content = {
+                    "message":"Name cannot be empty"
+                    }
+            )
+        
         # Check if user already exists
         existing_user = db.query(User).filter(User.email == payload.email).first()
 
@@ -119,7 +121,12 @@ def signup_user(payload: SignupPayload, response: Response, db: Session = Depend
                 return {"message": "welcome user", "user_id": existing_user.id}
             else:
                 # Password doesn't match
-                raise HTTPException(status_code=400, detail="Account already exists. Please enter correct password or login instead")
+                return JSONResponse(
+                status_code=400, 
+                content = {
+                    "message":"Account already exists. Please enter correct password or login instead"
+                    }
+            )
         else:
             # User doesn't exist, create new user
             hashed_password = hash_password(payload.password)
@@ -151,26 +158,42 @@ def signup_user(payload: SignupPayload, response: Response, db: Session = Depend
                 secure=False,  # Set to True in production with HTTPS
                 samesite="lax"
             )
-
-            return {"message": "welcome user", "user_id": new_user.id}
+ 
+            return JSONResponse(
+                status_code=200, 
+                content = {"message": "welcome user", "user_id": new_user.id}
+            )
     except HTTPException:
         raise  # Re-raise HTTP exceptions
     except Exception as e:
         print(f"Error during signup: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred during signup")
+        return JSONResponse(
+                status_code=500, 
+                content = {
+                    "message":"An error occurred during signup"
+                    }
+            )
 
 @app.post("/login")
 def login_user(payload: LoginPayload, response: Response, db: Session = Depends(get_db)):
     try:
         # Find user by email
         user = db.query(User).filter(User.email == payload.email).first()
-
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "message":"User not found"
+                }
+            )
         # Verify password
         if not verify_password(payload.password, str(user.password)):
-            raise HTTPException(status_code=401, detail="Invalid credentials")
+            return JSONResponse(
+                status_code=401, 
+                content = {
+                    "message":"Invalid credentials"
+                    }
+            )
 
         # Create JWT token
         token_data = {
@@ -178,7 +201,6 @@ def login_user(payload: LoginPayload, response: Response, db: Session = Depends(
             "email": user.email
         }
         token = create_access_token(token_data)
-
         response.set_cookie(
             key="access_token",
             value=token,
@@ -191,13 +213,17 @@ def login_user(payload: LoginPayload, response: Response, db: Session = Depends(
         # Update last login
         user.last_login = datetime.utcnow()
         db.commit()
-
         return {"message": "welcome user", "user_id": user.id, "name": user.name}
     except HTTPException:
         raise  # Re-raise HTTP exceptions
     except Exception as e:
         print(f"Error during login: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred during login")
+        return JSONResponse(
+                status_code=500, 
+                content = {
+                    "message":"An error occured during login"
+                    }
+            )
 
 @app.post("/ask")
 async def chatbot_logic(payload: AskPayload, request: Request, response: Response, db: Session = Depends(get_db)):
@@ -207,13 +233,23 @@ async def chatbot_logic(payload: AskPayload, request: Request, response: Respons
         payload_token = verify_token(token)
 
         if not payload_token:
-            raise HTTPException(status_code=401, detail="Please login to your account")
+            return JSONResponse(
+                status_code=401, 
+                content = {
+                    "message":"Please login to your account"
+                    }
+            )
 
         # Get user's experience level to customize the response
         user = db.query(User).filter(User.id == payload_token["id"]).first()
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
+            return JSONResponse(
+                status_code=404, 
+                content = {
+                    "message":"User not found"
+                    }
+            )
+        
         experience_level = user.level_of_experience
 
         # Format the question with selected text context and user's experience level
@@ -264,7 +300,12 @@ Please tailor your response to match the user's experience level, providing appr
         raise  # Re-raise HTTP exceptions
     except Exception as e:
         print(f"Error in chatbot logic: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while processing your question")
+        return JSONResponse(
+                status_code=500, 
+                content = {
+                    "message":"An error occurred while processing your question"
+                    }
+            )
 
 @app.get("/get-sessions")
 def get_sessions(request: Request, db: Session = Depends(get_db)):
@@ -272,12 +313,22 @@ def get_sessions(request: Request, db: Session = Depends(get_db)):
         # Get token from cookies
         token = request.cookies.get("access_token")
         if not token:
-            raise HTTPException(status_code=401, detail="Please login first")
-
+            return JSONResponse(
+                status_code=401, 
+                content = {
+                    "message":"Please login first"
+                    }
+            )
+        
         # Verify token
         payload = verify_token(token)
         if not payload:
-            raise HTTPException(status_code=401, detail="Please login first")
+            return JSONResponse(
+                status_code=500, 
+                content = {
+                    "message":"An error occurred while processing your question"
+                    }
+            )
 
         # Get user ID from token
         user_id = payload["id"]
@@ -301,14 +352,24 @@ def get_sessions(request: Request, db: Session = Depends(get_db)):
         raise  # Re-raise HTTP exceptions
     except Exception as e:
         print(f"Error retrieving sessions: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while retrieving sessions")
-
+        return JSONResponse(
+                status_code=500, 
+                content = {
+                    "message":"An error occurred while retrieving sessions"
+                    }
+            )
+    
 @app.post("/get-chats")
 def get_chats(payload: GetChatsPayload, db: Session = Depends(get_db)):
     try:
         # Validate session ID
         if not payload.session_id:
-            raise HTTPException(status_code=400, detail="Session ID is required")
+            return JSONResponse(
+                status_code=400, 
+                content = {
+                    "message":"Session ID is required"
+                    }
+            )
 
         # Query chats for the given session
         chats = db.query(Chat).filter(Chat.session_id == payload.session_id).all()
@@ -330,7 +391,30 @@ def get_chats(payload: GetChatsPayload, db: Session = Depends(get_db)):
         raise  # Re-raise HTTP exceptions
     except Exception as e:
         print(f"Error retrieving chats: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while retrieving chats")
+        return JSONResponse(
+                status_code=500, 
+                content = {
+                    "message":"An error occured whiole retrieving chats"
+                    }
+            )
+
+@app.get("/logout")
+def logout(response:Response):
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value="",  # Value can be empty
+        max_age=0,  # Expires the cookie immediately
+        httponly=True,
+        secure=True, # Should be True if you use HTTPS in production
+        path="/", # Must match the path the original cookie was set with
+        samesite="strict" # Must match the SameSite policy
+    )
+    return JSONResponse(
+        status_code=200,
+        content={
+            "message":"Logout successfully"
+        }
+    )
 
 @app.get("/")
 def home():

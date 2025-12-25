@@ -1,3 +1,4 @@
+import "dotenv/config"
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
@@ -8,14 +9,24 @@ const config: Config = {
   title: 'Learn Modern Physical AI And Humanoid Robotics',
   tagline: 'Learn state of the art robotics skills and gain hands on experience with ROS 2 , Nvidia ISAAC ',
   favicon: 'img/favicon.ico',
-
+  scripts: [
+      {
+      src: 'https://cdn.platform.openai.com/deployments/chatkit/chatkit.js',
+      async: true,
+      defer: true,
+    },
+  ],
+  customFields: {
+    api_url:process.env.VITE_API_URL || "http://localhost:8000",
+    client_url:process.env.VITE_CLIENT_URL || "http://localhost:3000"
+  },
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
   },
 
   // Set the production url of your site here
-  url: 'https://hackathon-ai-native-book-rho.vercel.app/',
+  url: process.env.VITE_CLIENT_URL || "http://localhost:3000",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',

@@ -2,10 +2,9 @@ import uuid
 import datetime
 from dotenv import load_dotenv
 import os
-from sqlalchemy import create_engine, Column, String, Integer, DateTime, Text, ForeignKey
+from sqlalchemy import create_engine, Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session, relationship
-from sqlalchemy.sql import func
+from sqlalchemy.orm import sessionmaker, relationship
 
 load_dotenv()
 

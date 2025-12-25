@@ -6,7 +6,7 @@ version: "1.0.0"
 
 # Spec generation skill :
 
-## When to Use This Skill
+## When to Use This Skill :
 
 - User asks to generate specification commmand  .
 - When user mention explicit call .

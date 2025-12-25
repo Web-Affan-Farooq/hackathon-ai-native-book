@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './ChatWidget.css';
-import { signup, login, sendMessage, getSessions, getChats, isAuthenticated, logout } from './api';
+import { useSessions } from '../../stores/session';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 interface Message {
   id: string;
@@ -9,164 +9,184 @@ interface Message {
   timestamp: Date;
 }
 
-interface ChatSession {
-  id: string;
-  name: string;
-  created_at: string;
-}
-
 const ChatWidget: React.FC = () => {
+  const { sessions, setSession, setSelectedSession, selectedSession, isUserAuthenticated, setIsUserAuthenticated } = useSessions();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [selectedSession, setSelectedSession] = useState<string | null>(null);
-  const [userToken, setUserToken] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [messages, setMessages] = useState<any[]>([]);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
-  // Check for existing token on component mount
-  useEffect(() => {
-    const token = isAuthenticated();
-    if (token) {
-      setUserToken('exists'); // Just to indicate auth status
-    }
-  }, []);
-
-  // Scroll to bottom of messages when messages change
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleSignup = async (email: string, password: string, name: string, experienceLevel: number) => {
-    const result = await signup({
-      name,
-      email,
-      password,
-      level_of_experience: experienceLevel
-    });
-
-    if (result.success) {
-      setUserToken('exists');
-      return { success: true };
-    } else {
-      return { success: false, error: result.error };
-    }
-  };
-
-  const handleLogin = async (email: string, password: string) => {
-    const result = await login({ email, password });
-
-    if (result.success) {
-      setUserToken('exists');
-      return { success: true };
-    } else {
-      return { success: false, error: result.error };
-    }
-  };
+  const {siteConfig: {
+    customFields
+  }} = useDocusaurusContext()
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading || !userToken) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputValue,
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsLoading(true);
+    if (!inputValue.trim() || !isUserAuthenticated) return;
 
     try {
-      const result = await sendMessage(inputValue, selectedSession || undefined);
+      // Get selected text from the page
+      const selectedText = window.getSelection()?.toString() || '';
 
-      if (result.success && result.response) {
-        // Update session ID if it's new
-        if (result.sessionId && !selectedSession) {
-          setSelectedSession(result.sessionId);
+      // Prepare the payload
+      const payload: any = {
+        question: inputValue,
+        user_selected_text: selectedText,
+      };
+
+      // Add session ID if available
+      if (selectedSession?.id) {
+        payload.session_id = selectedSession.id;
+      }
+
+      // Call the backend API
+      const response = await fetch(`${customFields.api_url}/ask`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+        credentials: 'include',
+      });
+
+      if (response.status === 404) {
+        setIsUserAuthenticated(false);
+        window.location.href = `${customFields.client_url}/signup`;
+        return;
+      } else if (response.status === 401) {
+        setIsUserAuthenticated(false);
+        window.location.href = `${customFields.client_url}/login`;
+        return;
+      }
+
+      const data = await response.json();
+      if (response.ok) {
+        // Update session if it's new
+        if (data.chat?.session_id && !selectedSession) {
+          // Fetch session details to get the name
+          const sessionResponse = await fetch(`${customFields.api_url}/get-sessions`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (sessionResponse.ok) {
+            const sessionData = await sessionResponse.json();
+            const newSession = sessionData.sessions?.find((s: any) => s.id === data.chat.session_id);
+            if (newSession) {
+              const sessionObj = {
+                id: newSession.id,
+                name: newSession.name
+              };
+              setSelectedSession(sessionObj);
+            }
+          }
         }
 
-        const aiMessage: Message = {
-          id: `ai-${Date.now()}`,
-          role: 'assistant',
-          content: result.response,
-          timestamp: new Date(),
-        };
-
-        setMessages(prev => [...prev, aiMessage]);
+        // Add both question and answer to messages
+        setMessages(prev => [
+          ...prev,
+          { id: `user-${Date.now()}`, role: 'user', text: inputValue },
+          { id: `assistant-${Date.now()}`, role: 'assistant', text: data.chat.answer }
+        ]);
       } else {
-        const errorMessage: Message = {
-          id: `error-${Date.now()}`,
-          role: 'assistant',
-          content: `Error: ${result.error || 'Failed to get response'}`,
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, errorMessage]);
+        setMessages(prev => [
+          ...prev,
+          { id: `error-${Date.now()}`, role: 'assistant', text: `Error: ${data.message || 'Failed to get response'}` }
+        ]);
       }
     } catch (error) {
-      const errorMessage: Message = {
-        id: `error-${Date.now()}`,
-        role: 'assistant',
-        content: 'Error: Network connection failed',
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+      setMessages(prev => [
+        ...prev,
+        { id: `error-${Date.now()}`, role: 'assistant', text: 'Error: Network connection failed' }
+      ]);
     }
+
+    setInputValue('');
   };
 
   const loadSessions = async () => {
-    if (!userToken) return;
+    if (!isUserAuthenticated) return;
 
-    const result = await getSessions();
-    if (result.success) {
-      setSessions(result.sessions || []);
-    } else {
-      console.error('Error loading sessions:', result.error);
+    try {
+      const response = await fetch(`${customFields.api_url}/get-sessions`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (response.status === 404) {
+        setIsUserAuthenticated(false);
+        window.location.href = `${customFields.client_url}/signup`;
+        return;
+      } else if (response.status === 401) {
+        setIsUserAuthenticated(false);
+        window.location.href = `${customFields.client_url}/login`;
+        return;
+      }
+
+      const data = await response.json();
+      if (response.ok) {
+        // Map the server response to match our Session type
+        const mappedSessions = data.sessions?.map((session: any) => ({
+          id: session.id,
+          name: session.name || `Session ${new Date(session.created_at).toLocaleDateString()}`
+        })) || [];
+
+        setSession(mappedSessions);
+      }
+    } catch (error) {
+      console.error('Network error loading sessions:', error);
     }
   };
 
   const loadChats = async (sessionId: string) => {
-    if (!userToken) return;
+    if (!isUserAuthenticated) return;
 
-    const result = await getChats(sessionId);
-    if (result.success) {
-      const chatMessages: Message[] = result.chats?.map((chat: any) => ({
-        id: chat.id,
-        role: 'assistant',
-        content: chat.answer,
-        timestamp: new Date(chat.created_at),
-      })) || [];
+    try {
+      const response = await fetch(`${customFields.api_url}/get-chats`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ session_id: sessionId }),
+        credentials: 'include',
+      });
 
-      // Add the user's questions to the chat history
-      const fullMessages: Message[] = [];
-      for (const chat of result.chats || []) {
-        fullMessages.push({
-          id: `user-${chat.id}`,
-          role: 'user',
-          content: chat.question,
-          timestamp: new Date(chat.created_at),
-        });
-        fullMessages.push({
-          id: chat.id,
-          role: 'assistant',
-          content: chat.answer,
-          timestamp: new Date(chat.created_at),
-        });
+      if (response.status === 404) {
+        setIsUserAuthenticated(false);
+        window.location.href = `${customFields.client_url}/signup`;
+        return;
+      } else if (response.status === 401) {
+        setIsUserAuthenticated(false);
+        window.location.href = `${customFields.client_url}/login`;
+        return;
       }
 
-      setMessages(fullMessages);
-      setSelectedSession(sessionId);
-    } else {
-      console.error('Error loading chats:', result.error);
+      const data = await response.json();
+      if (response.ok) {
+        // Convert chat data to messages format
+        const chatMessages: any[] = [];
+        for (const chat of data.chats || []) {
+          chatMessages.push({
+            id: `user-${chat.id}`,
+            role: 'user',
+            text: chat.question
+          });
+          chatMessages.push({
+            id: chat.id,
+            role: 'assistant',
+            text: chat.answer
+          });
+        }
+
+        setMessages(chatMessages);
+
+        // Update the selected session in the zustand store
+        const sessionToSelect = sessions.find(s => s.id === sessionId);
+        if (sessionToSelect) {
+          setSelectedSession(sessionToSelect);
+        }
+      }
+    } catch (error) {
+      console.error('Network error loading chats:', error);
     }
   };
 
@@ -177,42 +197,90 @@ const ChatWidget: React.FC = () => {
     }
   };
 
-  if (!userToken) {
+  if (!isUserAuthenticated) {
     return (
-      <div className="chat-auth-container">
-        <div className="chat-auth-widget">
-          <div className="chat-auth-header">
-            <h3>Physical AI Chatbot</h3>
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        zIndex: 1000
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          padding: '20px',
+          width: '350px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+            <h3 style={{ margin: 0, fontSize: '16px' }}>Physical AI Chatbot</h3>
             <button
-              className="chat-close-btn"
               onClick={() => setIsOpen(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '20px',
+                cursor: 'pointer',
+                padding: '0',
+                width: '24px',
+                height: '24px'
+              }}
             >
               ×
             </button>
           </div>
-          <AuthForm
-            onSignup={handleSignup}
-            onLogin={handleLogin}
-            onAuthSuccess={() => {
-              setUserToken('exists');
-            }}
-          />
+          <p>Please log in to use the chatbot</p>
+          <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            <a href={`${customFields.client_url}/login`} style={{ color: '#007cba', textDecoration: 'none', marginRight: '10px' }}>
+              Login
+            </a>
+            <span>or</span>
+            <a href={`${customFields.client_url}/signup`} style={{ color: '#007cba', textDecoration: 'none', marginLeft: '10px' }}>
+              Sign Up
+            </a>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="chat-container">
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      right: '20px',
+      zIndex: 1000
+    }}>
       {isOpen ? (
-        <div className="chat-widget">
-          <div className="chat-header">
-            <h3>Physical AI Chatbot</h3>
-            <div className="chat-controls">
+        <div style={{
+          backgroundColor: 'white',
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          width: '350px',
+          height: '500px',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        }}>
+          <div style={{
+            padding: '15px',
+            borderBottom: '1px solid #eee',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <h3 style={{ margin: 0, fontSize: '16px' }}>Physical AI Chatbot</h3>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <select
-                value={selectedSession || ''}
-                onChange={(e) => e.target.value ? loadChats(e.target.value) : setSelectedSession(null)}
-                className="session-select"
+                value={selectedSession?.id || ''}
+                onChange={(e) => e.target.value ? loadChats(e.target.value) : setSelectedSession(null as any)}
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '14px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc'
+                }}
               >
                 <option value="">New Session</option>
                 {sessions.map(session => (
@@ -222,55 +290,80 @@ const ChatWidget: React.FC = () => {
                 ))}
               </select>
               <button
-                className="chat-minimize-btn"
                 onClick={() => setIsOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  width: '24px',
+                  height: '24px'
+                }}
               >
                 −
               </button>
             </div>
           </div>
 
-          <div className="chat-messages">
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '15px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+          }}>
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`chat-message ${message.role}`}
+                style={{
+                  alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
+                  backgroundColor: message.role === 'user' ? '#007cba' : '#f1f1f1',
+                  color: message.role === 'user' ? 'white' : 'black',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  maxWidth: '80%'
+                }}
               >
-                <div className="message-content">
-                  {message.content}
-                </div>
-                <div className="message-timestamp">
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
+                {message.text}
               </div>
             ))}
-            {isLoading && (
-              <div className="chat-message assistant">
-                <div className="message-content">
-                  <div className="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </div>
-              </div>
-            )}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="chat-input-area">
+          <div style={{
+            padding: '10px',
+            borderTop: '1px solid #eee',
+            display: 'flex'
+          }}>
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask about robotics concepts..."
-              className="chat-input"
+              style={{
+                flex: 1,
+                padding: '8px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                resize: 'none',
+                fontSize: '14px'
+              }}
               rows={2}
             />
             <button
               onClick={handleSendMessage}
-              disabled={isLoading || !inputValue.trim()}
-              className="chat-send-btn"
+              disabled={!inputValue.trim()}
+              style={{
+                marginLeft: '10px',
+                padding: '8px 15px',
+                backgroundColor: inputValue.trim() ? '#007cba' : '#ccc',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: inputValue.trim() ? 'pointer' : 'not-allowed'
+              }}
             >
               Send
             </button>
@@ -278,143 +371,29 @@ const ChatWidget: React.FC = () => {
         </div>
       ) : (
         <button
-          className="chat-open-btn"
           onClick={() => {
             setIsOpen(true);
             loadSessions();
           }}
+          style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            backgroundColor: '#007cba',
+            color: 'white',
+            border: 'none',
+            fontSize: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}
         >
-          💬 Chat
+          💬
         </button>
       )}
     </div>
-  );
-};
-
-// AuthForm component for login/signup
-interface AuthFormProps {
-  onSignup: (email: string, password: string, name: string, experienceLevel: number) => Promise<any>;
-  onLogin: (email: string, password: string) => Promise<any>;
-  onAuthSuccess: () => void;
-}
-
-const AuthForm: React.FC<AuthFormProps> = ({ onSignup, onLogin, onAuthSuccess }) => {
-  const [isLoginView, setIsLoginView] = useState(true);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [experienceLevel, setExperienceLevel] = useState(1);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    if (isLoginView) {
-      const result = await onLogin(email, password);
-      if (result.success) {
-        onAuthSuccess();
-      } else {
-        setError(result.error);
-      }
-    } else {
-      if (password !== confirmPassword) {
-        setError('Passwords do not match');
-        setLoading(false);
-        return;
-      }
-
-      const result = await onSignup(email, password, name, experienceLevel);
-      if (result.success) {
-        onAuthSuccess();
-      } else {
-        setError(result.error);
-      }
-    }
-
-    setLoading(false);
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      {!isLoginView && (
-        <div className="form-group">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Full Name"
-            required
-          />
-        </div>
-      )}
-
-      <div className="form-group">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-      </div>
-
-      <div className="form-group">
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-      </div>
-
-      {!isLoginView && (
-        <>
-          <div className="form-group">
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm Password"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Experience Level:</label>
-            <select
-              value={experienceLevel}
-              onChange={(e) => setExperienceLevel(Number(e.target.value))}
-            >
-              <option value={1}>Beginner (1)</option>
-              <option value={2}>Intermediate (2)</option>
-              <option value={3}>Advanced (3)</option>
-            </select>
-          </div>
-        </>
-      )}
-
-      {error && <div className="error-message">{error}</div>}
-
-      <button type="submit" disabled={loading} className="auth-submit-btn">
-        {loading ? 'Processing...' : (isLoginView ? 'Login' : 'Sign Up')}
-      </button>
-
-      <button
-        type="button"
-        onClick={() => {
-          setIsLoginView(!isLoginView);
-          setError('');
-        }}
-        className="auth-toggle-btn"
-      >
-        {isLoginView ? 'Need an account? Sign Up' : 'Already have an account? Login'}
-      </button>
-    </form>
   );
 };
 

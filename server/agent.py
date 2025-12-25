@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import cohere
 from qdrant_client import QdrantClient
 from agents import AsyncOpenAI, OpenAIChatCompletionsModel, RunConfig, Agent, Runner, function_tool
-import asyncio
 
 load_dotenv()
 
@@ -23,7 +22,7 @@ client = AsyncOpenAI(
 )
 
 model = OpenAIChatCompletionsModel(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash-lite",
     openai_client=client
 )
 
@@ -85,7 +84,7 @@ def retrieve_context(query: str) -> str:
 # Define the agent with instructions for the Physical AI and Humanoid Robotics textbook
 bot = Agent(
     name="Physical AI and Humanoid Robotics Chatbot",
-    instructions="""You are an educational assistant for the Physical AI and Humanoid Robotics textbook.
+       instructions="""You are an educational assistant for the Physical AI and Humanoid Robotics textbook.
     Your role is to help students understand robotics concepts by providing clear explanations,
     examples, and guidance based on their experience level. Always be helpful, accurate, and
     educational. When possible, reference content from the textbook by using the retrieve_context tool.
@@ -93,17 +92,16 @@ bot = Agent(
     tools=[retrieve_context]
 )
 
+
 async def run_agent(question: str):
     try:
-        response = await Runner.run(
-            starting_agent=bot,
-            input=question,
-            run_config=config
-        )
-        print(response.final_output)
+        # response = await Runner.run(
+        #     starting_agent=bot,
+        #     input=question,
+        #     run_config=config
+        # )
+        # return response.final_output
+        return "(testing ...)   mic check 123"
     except Exception as e:
         print(f"Error running agent: {e}")
         return f"I encountered an issue processing your request. Please try again. Error: {str(e)}"
-    
-# asyncio.run(run_agent("tell me what are the basic hardware requirements to get started with this book "))
-print("Gemini : ",api_key)

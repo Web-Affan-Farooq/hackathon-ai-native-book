@@ -23,7 +23,7 @@ class Embedding:
 
         self.EMBED_MODEL = "embed-english-v3.0"
         self.COLLECTION = "physical-ai-humanoid-robotics"
-        self.sitemap = os.getenv("SITEMAP_URL")
+        self.sitemap = os.getenv("SITEMAP_URL" , "")
 
         self.BATCH_SIZE = 20
         self.MAX_CHARS = 1200
